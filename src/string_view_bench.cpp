@@ -16,7 +16,7 @@ Histogram find_raw(size_t n) {
     Histogram stats;
     size_t    its = 0;
 
-    RawHash<std::string_view, size_t> map;
+    RawHashMap<std::string_view, size_t> map;
     if (n > g_corpus.words.size()) {
         n = g_corpus.words.size();
     }

@@ -19,7 +19,7 @@ Histogram find_raw(size_t n) {
     size_t       its = 0;
 
     while (its < SAMPLES) {
-        RawHash<uint32_t, size_t> map;
+        RawHashMap<uint32_t, size_t> map;
         {
             for (size_t i = 0; i < n; i++) {
                 map[rng()] += 1;
@@ -138,7 +138,7 @@ int main() {
 
         outfile << "Cycles for adding element\n\n";
         for (size_t n = min; n <= max; n *= 10) {
-            auto raw   = add<RawHash<uint32_t, size_t>>(n);
+            auto raw   = add<RawHashMap<uint32_t, size_t>>(n);
             auto unord = add<std::unordered_map<uint32_t, size_t>>(n);
 
             outfile << "n_elements: " << n << "\n";

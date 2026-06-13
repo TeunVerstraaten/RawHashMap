@@ -71,7 +71,7 @@ static void BM_add_unordered_map(benchmark::State& state) {
     BM_add<std::unordered_map<std::string_view, size_t>>(state);
 }
 static void BM_add_raw_hash_map(benchmark::State& state) {
-    BM_add<RawHash<std::string_view, size_t>>(state);
+    BM_add<RawHashMap<std::string_view, size_t>>(state);
 }
 
 static void BM_find_unordered_map(benchmark::State& state) {
@@ -109,7 +109,7 @@ static void BM_find_raw_hash_map(benchmark::State& state) {
         n = g_corpus.words.size();
     }
 
-    RawHash<std::string_view, size_t> map;
+    RawHashMap<std::string_view, size_t> map;
 
     for (size_t i = 0; i < n; i++) {
         map[g_corpus.words[i]] += 1;

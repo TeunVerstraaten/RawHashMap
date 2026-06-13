@@ -33,7 +33,7 @@ static void BM_add_unordered_map(benchmark::State& state) {
     BM_add<std::unordered_map<uint32_t, size_t>>(state);
 }
 static void BM_add_raw_hash_map(benchmark::State& state) {
-    BM_add<RawHash<uint32_t, size_t>>(state);
+    BM_add<RawHashMap<uint32_t, size_t>>(state);
 }
 
 static void BM_find_unordered_map(benchmark::State& state) {
@@ -75,7 +75,7 @@ static void BM_find_raw_hash_map(benchmark::State& state) {
     std::mt19937 rng(SEED);
     size_t       its = 0;
 
-    RawHash<uint32_t, size_t> map;
+    RawHashMap<uint32_t, size_t> map;
     map.reserve(n);
     auto rngs = std::vector<uint32_t>{};
     rngs.reserve(n);
