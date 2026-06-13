@@ -2,3 +2,5 @@ text*
 *.dat
 a.out
 bench
+*.png
+.venv

@@ -2,16 +2,18 @@
 
 import argparse
 import math
+from typing import Tuple
+from matplotlib.axes import Axes
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def parse_file(filename):
+def parse_file(filename: str):
     with open(filename, "r") as f:
         lines = [line.strip() for line in f if line.strip()]
 
     global_title = lines[0]
-    datasets = []
+    datasets: list[tuple[int, dict[str, list[float]]]] = []
 
     i = 1
     while i < len(lines):
@@ -20,7 +22,7 @@ def parse_file(filename):
 
             columns = lines[i + 1].split()
 
-            data = {col: [] for col in columns}
+            data: dict[str, list[float]] = {col: [] for col in columns}
 
             i += 2
 
@@ -41,19 +43,12 @@ def parse_file(filename):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Plot benchmark results from a data file."
-    )
+    plot("find.dat")
+    plot("add.dat")
 
-    parser.add_argument("filename", help="Input benchmark data file")
 
-    parser.add_argument(
-        "--logy", action="store_true", help="Use logarithmic scale on Y axis"
-    )
-
-    args = parser.parse_args()
-
-    global_title, datasets = parse_file(args.filename)
+def plot(filename: str):
+    global_title, datasets = parse_file(filename)
 
     nplots = len(datasets)
 
@@ -84,9 +79,6 @@ def main():
         ax.set_xlabel("n")
         ax.set_ylabel("cycles")
 
-        if args.logy:
-            ax.set_yscale("log")
-
         ax.grid(axis="y", linestyle="--", alpha=0.5)
         ax.legend()
 
@@ -97,7 +89,7 @@ def main():
     fig.suptitle(global_title, fontsize=16)
     fig.tight_layout()
 
-    plt.show()
+    plt.savefig(global_title)
 
 
 if __name__ == "__main__":
