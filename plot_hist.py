@@ -43,8 +43,10 @@ def parse_file(filename: str):
 
 
 def main():
-    plot("find.dat")
-    plot("add.dat")
+    plot("find__uint32_t.dat")
+    plot("add__uint32_t.dat")
+    plot("find__string_view.dat")
+    plot("add__string_view.dat")
 
 
 def plot(filename: str):
