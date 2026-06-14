@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
-import argparse
 import math
-from typing import Tuple
-from matplotlib.axes import Axes
 import numpy as np
 import matplotlib.pyplot as plt
 

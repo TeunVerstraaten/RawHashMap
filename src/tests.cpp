@@ -1,34 +1,35 @@
+#include "open_hash_map.h"
 #include "raw_hash_map.h"
 
 #include <gtest/gtest.h>
 
-struct DestructionCounted {
-    std::shared_ptr<size_t> _ptr;
-    DestructionCounted(std::shared_ptr<size_t>& ptr) : _ptr(ptr) {
-        ++*_ptr;
-    }
-
-    DestructionCounted(const DestructionCounted& other) : _ptr(other._ptr) {
-        ++*_ptr;
-    }
-
-    ~DestructionCounted() {
-        --*_ptr;
-    }
-};
-
 TEST(RawHashMapTest, InsertAndRemove) {
-    auto count = std::make_shared<size_t>(0);
-    auto hm    = RawHashMap<size_t, DestructionCounted>{};
+    static size_t counter;
+    struct DestructionCounted {
+        size_t _counter = counter;
+        DestructionCounted() {
+            ++_counter;
+        }
 
-    hm[2] = DestructionCounted(count);
-    hm[2] = DestructionCounted(count);
+        DestructionCounted(const DestructionCounted& other) {
+            ++_counter;
+        }
+
+        ~DestructionCounted() {
+            --_counter;
+        }
+    };
+
+    auto hm = RawHashMap<size_t, DestructionCounted>{};
+
+    hm[2] = DestructionCounted();
+    hm[2] = DestructionCounted();
 
     hm.remove(2);
 
     EXPECT_EQ(hm.get(2), nullptr);
     EXPECT_EQ(hm.occupied(), 0);
-    EXPECT_EQ(*count, 0);
+    EXPECT_EQ(counter, 0);
 }
 
 TEST(RawHashMapTest, BasicOperatorSqBracket) {
@@ -40,10 +41,24 @@ TEST(RawHashMapTest, BasicOperatorSqBracket) {
     EXPECT_EQ(hm.occupied(), 1);
     EXPECT_EQ(*hm.get(2), 2);
 
-    // hm[2] += 2;
+    hm[2] += 2;
 
-    // EXPECT_EQ(hm.occupied(), 1);
-    // EXPECT_EQ(*hm.get(2), 4);
+    EXPECT_EQ(hm.occupied(), 1);
+    EXPECT_EQ(*hm.get(2), 4);
+}
+TEST(RoawHashMapTest, BasicOperatorSqBracket) {
+    auto hm = OpenHashMap<size_t, size_t>{};
+
+    hm[2] = 2;
+    hm.show();
+
+    EXPECT_EQ(hm.occupied(), 1);
+    EXPECT_EQ(*hm.get(2), 2);
+
+    hm[2] += 2;
+
+    EXPECT_EQ(hm.occupied(), 1);
+    EXPECT_EQ(*hm.get(2), 4);
 }
 
 int main(int argc, char** argv) {
