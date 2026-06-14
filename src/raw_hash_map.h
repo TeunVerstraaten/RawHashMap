@@ -17,37 +17,37 @@ template <typename K, typename V>
 class RawHashMapProxy {
     friend class RawHashMap<K, V>;
 
-    RawHashMap<K, V>& _hm;
-    size_t            _index;
-    K                 _key;
+    K*       _key_slot;
+    V*       _value_slot;
+    uint8_t& _free;
+    size_t&  _occupied;
+    const K& _key;
 
-    RawHashMapProxy(RawHashMap<K, V>& raw_hash_map, size_t index, K key) : _hm(raw_hash_map), _index(index), _key(key) {
+    RawHashMapProxy(K* key_slot, V* value_slot, uint8_t& free, size_t& occupied, const K& key)
+        : _key_slot(key_slot), _value_slot(value_slot), _free(free), _occupied(occupied), _key(key) {
     }
 
   public:
     V& operator=(const V& value) {
-        if (_hm._free[_index]) {
-            new (&_hm._keys[_index]) K(std::move(_key));
-            new (&_hm._values[_index]) V(value);
-            _hm._free[_index] = 0;
-            ++_hm._occupied;
+        if (_free) {
+            new (_key_slot) K(_key);
+            new (_value_slot) V(value);
+            _free = 0;
+            ++_occupied;
         } else {
-            assert(_hm._keys[_index] == _key);
-            _hm._values[_index] = value;
+            *_value_slot = value;
         }
-        return _hm._values[_index];
+        return *_value_slot;
     }
 
     operator V&() {
-        if (_hm._free[_index]) {
-            new (&_hm._keys[_index]) K(std::move(_key));
-            new (&_hm._values[_index]) V{};
-            _hm._free[_index] = 0;
-            ++_hm._occupied;
-        } else {
-            assert(_hm._keys[_index] == _key);
+        if (_free) {
+            new (_key_slot) K(_key);
+            new (_value_slot) V{};
+            _free = 0;
+            ++_occupied;
         }
-        return _hm._values[_index];
+        return *_value_slot;
     }
 };
 
@@ -132,6 +132,14 @@ class RawHashMap {
         ::operator delete(_values);
     }
 
+    void show() const {
+        for (size_t i = 0; i != _capacity; ++i) {
+            if (!_free[i]) {
+                std::cout << "i = " << i << " => " << _keys[i] << ": " << _values[i] << std::endl;
+            }
+        }
+    }
+
     size_t capacity() const {
         return _capacity;
     }
@@ -163,7 +171,6 @@ class RawHashMap {
 
         while (!_free[i]) {
             if (key == _keys[i]) {
-
                 _free[i] = 1;
                 --_occupied;
                 _values[i].~V();
@@ -195,25 +202,41 @@ class RawHashMap {
         ++_occupied;
     }
 
-    RawHashMapProxy<K, V> operator[](const K& key) {
+    // RawHashMapProxy<K, V> operator[](const K& key) {
+    //     resize_if_needed();
+    //
+    //     auto i = get_index(key);
+    //
+    //     while (!_free[i]) {
+    //         if (key == _keys[i]) {
+    //             break;
+    //         }
+    //         ++i;
+    //         i &= _capacity - 1;
+    //     }
+    //
+    //     return RawHashMapProxy<K, V>{&_keys[i], &_values[i], _free[i], _occupied, key};
+    // }
+
+    V& operator[](const K& key) {
         resize_if_needed();
 
         auto i = get_index(key);
 
         while (!_free[i]) {
             if (key == _keys[i]) {
-                return RawHashMapProxy<K, V>(*this, i, key);
+                return _values[i];
             }
             ++i;
             i &= _capacity - 1;
         }
 
-        // new (&_keys[i]) K(key);
-        // new (&_values[i]) V{};
-        // _free[i] = 0;
-        // ++_occupied;
+        new (&_keys[i]) K(std::move(key));
+        new (&_values[i]) V{};
+        _free[i] = 0;
+        ++_occupied;
 
-        return RawHashMapProxy<K, V>(*this, i, key);
+        return _values[i];
     }
 };
 
