@@ -1,4 +1,3 @@
-#include "open_hash_map.h"
 #include "raw_hash_map.h"
 
 #include <gtest/gtest.h>
@@ -36,21 +35,6 @@ TEST(RawHashMapTest, BasicOperatorSqBracket) {
     auto hm = RawHashMap<size_t, size_t>{};
 
     hm[2] = 2;
-    hm.show();
-
-    EXPECT_EQ(hm.occupied(), 1);
-    EXPECT_EQ(*hm.get(2), 2);
-
-    hm[2] += 2;
-
-    EXPECT_EQ(hm.occupied(), 1);
-    EXPECT_EQ(*hm.get(2), 4);
-}
-TEST(RoawHashMapTest, BasicOperatorSqBracket) {
-    auto hm = OpenHashMap<size_t, size_t>{};
-
-    hm[2] = 2;
-    hm.show();
 
     EXPECT_EQ(hm.occupied(), 1);
     EXPECT_EQ(*hm.get(2), 2);

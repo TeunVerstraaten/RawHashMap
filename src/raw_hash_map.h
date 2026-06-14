@@ -89,14 +89,6 @@ class RawHashMap {
         ::operator delete(_values);
     }
 
-    void show() const {
-        for (size_t i = 0; i != _capacity; ++i) {
-            if (!_free[i]) {
-                std::cout << "i = " << i << " => " << _keys[i] << ": " << _values[i] << std::endl;
-            }
-        }
-    }
-
     size_t capacity() const {
         return _capacity;
     }
