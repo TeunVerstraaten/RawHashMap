@@ -1,6 +1,6 @@
 text*
 *.dat
-a.out
+*.out
 bench
 *.png
 .venv
