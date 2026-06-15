@@ -28,10 +28,6 @@ class RawHashMap {
         for (size_t i = 0; i != _free.size(); ++i) {
             if (!_free[i]) {
                 new_hm.insert_in_next_free_slot(std::move(_keys[i]), std::move(_values[i]));
-
-                _free[i] = 1;
-                _keys[i].~K();
-                _values[i].~V();
             }
         }
 

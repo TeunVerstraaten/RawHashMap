@@ -69,7 +69,13 @@ def plot(filename: str):
         for idx, name in enumerate(series_names):
             offset = (idx - (len(series_names) - 1) / 2) * width
 
-            ax.bar(x + offset, data[name], width=width, label=name)
+            values = np.array(data[name])
+
+            ax.bar(x + offset, values, width=width, label=name)
+
+            cumulative = np.cumsum(values)
+
+            ax.plot(x + offset, cumulative, label=name + "_cumulative")
 
         ax.set_xticks(x)
         ax.set_xticklabels(x_labels)

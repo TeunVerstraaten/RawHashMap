@@ -13,7 +13,7 @@ void build_hist_data(std::string                                   title,
     std::ofstream outfile(title + ".dat");
     assert(outfile.is_open());
 
-    outfile << "find__string_view\n\n";
+    outfile << title << "\n\n";
     for (size_t n = min; n <= max; n *= 10) {
         std::vector<Histogram> results{};
         for (auto& f : benches) {
@@ -33,6 +33,7 @@ void build_hist_data(std::string                                   title,
             }
             outfile << "\n";
         }
+        outfile << "\n";
     }
 }
 
