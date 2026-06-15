@@ -4,9 +4,6 @@
 #include <bit>
 #include <cassert>
 #include <cstdint>
-#include <cstdlib>
-#include <functional>
-#include <iostream>
 #include <new>
 #include <vector>
 
@@ -20,11 +17,8 @@ class RawHashMap {
     std::vector<uint8_t> _free;
 
     void resize(size_t new_size) {
-        if (new_size <= _capacity) {
-            return;
-        }
         auto rounded_new_size = std::__bit_ceil(new_size);
-        auto new_hm           = RawHashMap<K, V>(rounded_new_size);
+        auto new_hm           = RawHashMap<K, V>(rounded_new_size, _resize_threshold);
         for (size_t i = 0; i != _free.size(); ++i) {
             if (!_free[i]) {
                 new_hm.insert_in_next_free_slot(std::move(_keys[i]), std::move(_values[i]));
@@ -71,7 +65,6 @@ class RawHashMap {
           _keys(static_cast<K*>(::operator new(sizeof(K) * _capacity, std::align_val_t{alignof(K)}))),
           _values(static_cast<V*>(::operator new(sizeof(V) * _capacity, std::align_val_t{alignof(V)}))),
           _free(_capacity, 1) {
-        assert(resize_threshold <= 1.0);
     }
 
     ~RawHashMap() {
@@ -94,7 +87,9 @@ class RawHashMap {
     }
 
     void reserve(size_t n) {
-        resize(n);
+        if (n > _capacity) {
+            resize(n);
+        }
     }
 
     V* get(const K& key) {
@@ -111,7 +106,7 @@ class RawHashMap {
         return nullptr;
     }
 
-    void remove(const K& key) {
+    bool remove(const K& key) {
         auto i = get_index(key);
 
         while (!_free[i]) {
@@ -120,31 +115,32 @@ class RawHashMap {
                 --_occupied;
                 _values[i].~V();
                 _keys[i].~K();
-                return;
+                return true;
             }
             ++i;
             i &= _capacity - 1;
         }
+        return false;
     }
 
-    void insert(const K& key, V value) {
+    bool insert(const K& key, const V& value) {
         resize_if_needed();
 
         auto i = get_index(key);
 
         while (!_free[i]) {
             if (key == _keys[i]) {
-                _values[i] = value;
-                return;
+                return false;
             }
             ++i;
             i &= _capacity - 1;
         }
 
         new (&_keys[i]) K(key);
-        new (&_values[i]) V(std::move(value));
+        new (&_values[i]) V(value);
         _free[i] = 0;
         ++_occupied;
+        return true;
     }
 
     V& operator[](const K& key) {

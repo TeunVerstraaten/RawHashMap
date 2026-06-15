@@ -9,6 +9,5 @@ To generate the histograms run the following command
 To run the tests:
 
 ```
-g++ -std=c++17 src/tests.cpp -lgtest -lgtest_main -lpthread -o my_tests.out && ./my_tests.out
-
+./run_tests.sh
 ```

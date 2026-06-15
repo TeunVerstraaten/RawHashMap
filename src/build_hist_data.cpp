@@ -1,7 +1,9 @@
 #include "hist_functions.h"
 #include "histogram.h"
 
-#include <sparsehash/dense_hash_map>
+#include <cassert>
+#include <fstream>
+#include <functional>
 
 constexpr size_t MIN = 10;
 constexpr size_t MAX = 1'000'000;

@@ -34,7 +34,7 @@ class Histogram {
         ++_counts.back();
     }
 
-    const std::array<size_t, N> counts() const {
+    const std::array<size_t, N>& counts() const {
         return _counts;
     }
 };
