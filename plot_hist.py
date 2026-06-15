@@ -24,7 +24,7 @@ def parse_file(filename: str):
             i += 2
 
             while i < len(lines) and not lines[i].startswith("n_elements:"):
-                values = list(map(int, lines[i].split()))
+                values = list(map(float, lines[i].split()))
 
                 for col, value in zip(columns, values):
                     data[col].append(value)
@@ -65,7 +65,6 @@ def plot(filename: str):
         series_names = [c for c in data.keys() if c != "n"]
 
         width = 0.8 / len(series_names)
-
         for idx, name in enumerate(series_names):
             offset = (idx - (len(series_names) - 1) / 2) * width
 
@@ -75,10 +74,11 @@ def plot(filename: str):
 
             cumulative = np.cumsum(values)
 
-            ax.plot(x + offset, cumulative, label=name + "_cumulative")
+            ax.plot(x, cumulative, label=f"{name}_cumulative", marker="o")
 
-        ax.set_xticks(x)
-        ax.set_xticklabels(x_labels)
+        step = 2
+        ax.set_xticks(x[::step])
+        ax.set_xticklabels([f"{v}" for v in x_labels[::step]])  #
 
         ax.set_title(f"n_elements = {n_elements}")
         ax.set_xlabel("n")
@@ -87,7 +87,6 @@ def plot(filename: str):
         ax.grid(axis="y", linestyle="--", alpha=0.5)
         ax.legend()
 
-    # Hide unused subplots
     for ax in axes.flat[len(datasets) :]:
         ax.set_visible(False)
 

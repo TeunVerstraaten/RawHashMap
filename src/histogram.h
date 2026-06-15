@@ -4,11 +4,21 @@
 #include <array>
 #include <cstddef>
 
+template <size_t N>
+constexpr std::array<size_t, N> arithmetic_sequence(size_t a, size_t diff) {
+    std::array<size_t, N> result{};
+
+    for (std::size_t i = 0; i < N; ++i) {
+        result[i] = a + diff * i;
+    }
+
+    return result;
+}
+
 class Histogram {
   public:
-    static constexpr size_t                N       = 14;
-    static constexpr std::array<double, N> BUCKETS = {
-        20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 120.0, 140.0, 160.0, 180.0, 200.0};
+    static constexpr std::size_t N       = 15;
+    static constexpr auto        BUCKETS = arithmetic_sequence<N>(20, 10);
 
   private:
     std::array<size_t, N> _counts = {0};
