@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import math
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -40,18 +41,17 @@ def parse_file(filename: str):
 
 
 def main():
-    plot("find__uint32_t.dat")
-    plot("add__uint32_t.dat")
-    plot("find__string_view.dat")
-    plot("add__string_view.dat")
+    for file in sorted(Path(".").glob("*.dat")):
+        plot(str(file))
 
 
 def plot(filename: str):
+    print(f"plotting data in file: {filename}")
     global_title, datasets = parse_file(filename)
 
     nplots = len(datasets)
 
-    ncols = 3
+    ncols = 2
     nrows = math.ceil(nplots / ncols)
 
     fig, axes = plt.subplots(

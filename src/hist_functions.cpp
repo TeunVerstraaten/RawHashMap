@@ -62,7 +62,7 @@ Histogram hist_find_uint32_t_google(size_t n) {
     return stats;
 }
 
-Histogram hist_add_uint32_t_google(size_t n) {
+Histogram hist_insert_uint32_t_google(size_t n) {
     auto      rngs = random_vec(n);
     Histogram stats;
     size_t    its = 0;
@@ -90,7 +90,7 @@ Histogram hist_add_uint32_t_google(size_t n) {
     return stats;
 }
 
-Histogram hist_add_uint32_t_raw(size_t n) {
+Histogram hist_insert_uint32_t_raw(size_t n) {
     auto      rngs = random_vec(n);
     Histogram stats;
     size_t    its = 0;
@@ -173,7 +173,7 @@ Histogram hist_find_string_view_google(size_t n) {
     return stats;
 }
 
-Histogram hist_add_string_view_google(size_t n) {
+Histogram hist_insert_string_view_google(size_t n) {
     Histogram stats;
     size_t    its = 0;
 
@@ -201,7 +201,7 @@ Histogram hist_add_string_view_google(size_t n) {
     return stats;
 }
 
-Histogram hist_add_string_view_raw(size_t n) {
+Histogram hist_insert_string_view_raw(size_t n) {
     Histogram stats;
     size_t    its = 0;
 
