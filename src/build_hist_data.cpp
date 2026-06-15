@@ -1,20 +1,19 @@
 #include "hist_functions.h"
 #include "histogram.h"
-#include "raw_hash_map.h"
 
 #include <sparsehash/dense_hash_map>
-#include <string_view>
+
+constexpr size_t MIN = 10;
+constexpr size_t MAX = 1'000'000;
 
 void build_hist_data(std::string                                   title,
-                     size_t                                        min,
-                     size_t                                        max,
                      std::vector<std::string>                      bench_names,
                      std::vector<std::function<Histogram(size_t)>> benches) {
     std::ofstream outfile(title + ".dat");
     assert(outfile.is_open());
 
     outfile << title << "\n\n";
-    for (size_t n = min; n <= max; n *= 10) {
+    for (size_t n = MIN; n <= MAX; n *= 10) {
         std::vector<Histogram> results{};
         for (auto& f : benches) {
             results.push_back(f(n));
@@ -38,19 +37,8 @@ void build_hist_data(std::string                                   title,
 }
 
 int main() {
-    size_t min = 10;
-    size_t max = 1'000'000;
-
-    build_hist_data("find__string_view", min, max, {"raw", "google"}, {hist_find_raw_string_view, hist_find_google_string_view});
-    build_hist_data("find__uint32_t", min, max, {"raw", "google"}, {hist_find_raw_uint32_t, hist_find_google_uint32_t});
-    build_hist_data("add__string_view",
-                    min,
-                    max,
-                    {"raw", "google"},
-                    {hist_add_string_view<RawHashMap<std::string_view, size_t>>, hist_add_string_view_google});
-    build_hist_data("add__uint32_t",
-                    min,
-                    max,
-                    {"raw", "google"},
-                    {hist_add_uint32_t<RawHashMap<uint32_t, size_t>>, hist_add_uint32_t_google});
+    build_hist_data("find__string_view", {"raw", "google"}, {hist_find_string_view_raw, hist_find_string_view_google});
+    build_hist_data("find__uint32_t", {"raw", "google"}, {hist_find_uint32_t_raw, hist_find_uint32_t_google});
+    build_hist_data("add__string_view", {"raw", "google"}, {hist_add_string_view_raw, hist_add_string_view_google});
+    build_hist_data("add__uint32_t", {"raw", "google"}, {hist_add_uint32_t_raw, hist_add_uint32_t_google});
 }
