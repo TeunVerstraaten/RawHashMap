@@ -3,11 +3,11 @@ A fast hashmap implementation in c++.
 To generate the histograms run the following command
 
 ```
-./build_hist.sh
+make hist
 ```
 
-To run the tests:
+To run the tests, you need to have the google test suite installed, then run the command
 
 ```
-./run_tests.sh
+make test
 ```
