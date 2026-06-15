@@ -12,7 +12,7 @@ all: hist test
 
 hist: 
 	@echo "[1/3] Compiling histogram tool..."
-	@$(CXX) src/build_hist_data.cpp src/corpus.cpp src/hist_functions.cpp $(CXXFLAGS) -o $(HIST_BIN) 
+	@$(CXX) src/build_hist_data.cpp src/corpus.cpp src/remove_hist_functions.cpp src/find_hist_functions.cpp src/insert_hist_functions.cpp $(CXXFLAGS) -o $(HIST_BIN) 
 	@echo "[2/3] Generating data histogram data..."
 	@taskset -c 3 ./$(HIST_BIN)
 	@echo "[3/3] Plotting histograms..."
@@ -22,7 +22,7 @@ hist:
 
 bench: 
 	@echo "[1/2] Compiling bench..."
-	@$(CXX) src/bench_string_view.cpp src/corpus.cpp src/hist_functions.cpp $$(pkg-config --cflags --libs benchmark) $(CXXFLAGS) -o $(BENCH_BIN) 
+	@$(CXX) src/bench_string_view.cpp src/corpus.cpp $$(pkg-config --cflags --libs benchmark) $(CXXFLAGS) -o $(BENCH_BIN) 
 	@echo "[2/2] Running bench..."
 	@./$(BENCH_BIN)
 

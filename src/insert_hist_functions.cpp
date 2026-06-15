@@ -1,0 +1,134 @@
+#include "bench_tools.h"
+#include "corpus.h"
+#include "hist_functions.h"
+#include "raw_hash_map.h"
+
+#include <random>
+#include <sparsehash/dense_hash_map>
+
+static constexpr size_t SAMPLES   = 5'000'000;
+static constexpr size_t SEED      = 12345654321;
+static const Corpus     g_corpus  = load_corpus("text.txt");
+static constexpr auto   EMPTY_STR = "__EMPTY__";
+static constexpr auto   EMPTY_SV  = std::string_view{EMPTY_STR};
+static volatile int     sink;
+
+static std::vector<uint32_t> get_random_vec(size_t n) {
+    std::mt19937 rng(SEED);
+
+    std::vector<uint32_t> rngs;
+    rngs.reserve(n);
+    for (size_t i = 0; i != SAMPLES; ++i) {
+        rngs.push_back(rng());
+    }
+    return rngs;
+}
+
+Histogram hist_insert_uint32_t_google(size_t n) {
+    auto      rngs = get_random_vec(n);
+    Histogram stats;
+    size_t    its = 0;
+
+    while (its < SAMPLES) {
+        google::dense_hash_map<uint32_t, size_t> map;
+        map.set_empty_key(std::numeric_limits<uint32_t>::max());
+
+        for (size_t r = 0; r < n && its < SAMPLES; r++, ++its) {
+            auto num = rngs[r];
+
+            asm volatile("" ::: "memory");
+            uint64_t t0 = rdtsc_start();
+
+            auto& p = map[num] += 1;
+
+            asm volatile("" ::: "memory");
+            doNotOptimize(p);
+
+            uint64_t t1 = rdtsc_end();
+            sink += p;
+            stats.observe((double)(t1 - t0));
+        }
+    }
+    return stats;
+}
+
+Histogram hist_insert_uint32_t_raw(size_t n) {
+    auto      rngs = get_random_vec(n);
+    Histogram stats;
+    size_t    its = 0;
+
+    while (its < SAMPLES) {
+        RawHashMap<uint32_t, size_t> map;
+
+        for (size_t i = 0; i < n && its < SAMPLES; i++, ++its) {
+            auto num = rngs[its];
+
+            asm volatile("" ::: "memory");
+            uint64_t t0 = rdtsc_start();
+
+            auto& p = map[num] += 1;
+
+            asm volatile("" ::: "memory");
+            doNotOptimize(p);
+
+            uint64_t t1 = rdtsc_end();
+            sink += p;
+            stats.observe((double)(t1 - t0));
+        }
+    }
+    return stats;
+}
+
+Histogram hist_insert_string_view_google(size_t n) {
+    Histogram stats;
+    size_t    its = 0;
+
+    n = std::min(n, g_corpus.words.size());
+
+    while (its < SAMPLES) {
+        google::dense_hash_map<std::string_view, size_t> map;
+        map.set_empty_key(EMPTY_SV);
+
+        for (size_t r = 0; r < n && its < SAMPLES; r++, ++its) {
+            auto word = g_corpus.words[r];
+
+            asm volatile("" ::: "memory");
+            uint64_t t0 = rdtsc_start();
+
+            auto p = map[word] += 1;
+
+            asm volatile("" ::: "memory");
+            doNotOptimize(p);
+
+            uint64_t t1 = rdtsc_end();
+            stats.observe((double)(t1 - t0));
+        }
+    }
+    return stats;
+}
+
+Histogram hist_insert_string_view_raw(size_t n) {
+    Histogram stats;
+    size_t    its = 0;
+
+    n = std::min(n, g_corpus.words.size());
+
+    while (its < SAMPLES) {
+        RawHashMap<std::string_view, size_t> map;
+        for (size_t r = 0; r < n && its < SAMPLES; r++, ++its) {
+            auto word = g_corpus.words[r];
+
+            asm volatile("" ::: "memory");
+            uint64_t t0 = rdtsc_start();
+
+            auto p = map[word] += 1;
+
+            asm volatile("" ::: "memory");
+            doNotOptimize(p);
+
+            uint64_t t1 = rdtsc_end();
+            stats.observe((double)(t1 - t0));
+        }
+    }
+    return stats;
+}

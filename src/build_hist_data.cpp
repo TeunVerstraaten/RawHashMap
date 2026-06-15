@@ -41,6 +41,8 @@ void build_hist_data(std::string                                   title,
 int main() {
     build_hist_data("find__string_view", {"raw", "google"}, {hist_find_string_view_raw, hist_find_string_view_google});
     build_hist_data("find__uint32_t", {"raw", "google"}, {hist_find_uint32_t_raw, hist_find_uint32_t_google});
+    build_hist_data("remove__string_view", {"raw", "google"}, {hist_remove_string_view_raw, hist_remove_string_view_google});
+    build_hist_data("remove__uint32_t", {"raw", "google"}, {hist_remove_uint32_t_raw, hist_remove_uint32_t_google});
     build_hist_data("insert__string_view", {"raw", "google"}, {hist_insert_string_view_raw, hist_insert_string_view_google});
     build_hist_data("insert__uint32_t", {"raw", "google"}, {hist_insert_uint32_t_raw, hist_insert_uint32_t_google});
 }
